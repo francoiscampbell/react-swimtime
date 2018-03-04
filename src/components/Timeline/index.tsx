@@ -34,59 +34,62 @@ const Timeline: React.SFC<TimelineProps> = props => {
 	const startTime = props.startDate.getTime()
 	const timeInterval = props.endDate.getTime() - startTime
 	return (
-		<ZoomDiv>
-			<TimelineContainer>
-				{props.data.map((laneData, i) => (
-					<Lane
-						key={i}
-						laneData={laneData}
-						renderBar={props.renderBar}
-						startTime={startTime}
-						timeInterval={timeInterval}
-					/>
-				))}
-			</TimelineContainer>
-			<DateContainer>
-				<span>{props.startDate.toLocaleString()}</span>
-				<span>{props.endDate.toLocaleString()}</span>
-			</DateContainer>
-		</ZoomDiv>
+		<WithZoom>
+			{scaleFactor => {
+				const halfInterval = timeInterval / 2
+				const scaledStartTime = startTime + halfInterval * (1 - scaleFactor)
+				return (
+					<React.Fragment>
+						<TimelineContainer>
+							{props.data.map((laneData, i) => (
+								<Lane
+									key={i}
+									laneData={laneData}
+									renderBar={props.renderBar}
+									startTime={scaledStartTime}
+									timeInterval={timeInterval * scaleFactor}
+								/>
+							))}
+						</TimelineContainer>
+						<DateContainer>
+							<span>{props.startDate.toLocaleString()}</span>
+							<span>{props.endDate.toLocaleString()}</span>
+						</DateContainer>
+					</React.Fragment>
+				)
+			}}
+		</WithZoom>
 	)
 }
 
 export default Timeline
 
 
-const AppContainer = styled.div`
-	width: ${(props: AppContainerProps) => props.widthPx}px;
-`
-
-interface ZoomDivState {
-	widthPx: number
+interface WithZoomProps {
+	children: (number) => new() => React.Component
 }
 
-class ZoomDiv extends React.PureComponent<{}, ZoomDivState> {
+interface WithZoomState {
+	scaleFactor: number
+}
+
+class WithZoom extends React.PureComponent<WithZoomProps> {
 	state = {
-		widthPx: 1000
+		scaleFactor: 1
 	}
 
 	render() {
 		return (
-			<AppContainer 
-				onWheel={this.onMouseWheel}
-				widthPx={this.state.widthPx}
-			>
-				{this.props.children}
-			</AppContainer>
+			<div onWheel={this.onMouseWheel}>
+				{this.props.children(this.state.scaleFactor)}
+			</div>
 		)
 	}
 
 	onMouseWheel = e => {
-		const scaleIncrement = -e.deltaY
-		console.log(e.deltaY)
-		console.log(scaleIncrement)
+		const scaleIncrement = e.deltaY / 300
 		this.setState({
-			widthPx: this.state.widthPx + scaleIncrement
+			scaleFactor: this.state.scaleFactor * (1 + scaleIncrement)
 		})
 	}
 

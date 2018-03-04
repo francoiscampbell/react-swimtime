@@ -15,14 +15,20 @@ const LaneContainer = styled.div`
 	}    
 `
 
+function clamp(num: number, min: number, max: number) {
+	return Math.min(Math.max(num, min), max)
+}
+
 function getSublane(laneProps: LaneProps, sublaneData: SublaneData, key?: number) {
 	const {
 		start,
 		end,
 		...rest
 	} = sublaneData
-	const startPct = (start.getTime() - laneProps.startTime) / laneProps.timeInterval * 100
-	const widthPct = (end.getTime() - laneProps.startTime) / laneProps.timeInterval * 100 - startPct
+	const startRatio = (start.getTime() - laneProps.startTime) / laneProps.timeInterval
+	const startPct = clamp(startRatio * 100, 0, 100)
+	const widthRatio = (end.getTime() - laneProps.startTime) / laneProps.timeInterval - startRatio
+	const widthPct = clamp(widthRatio * 100, 0, 100 - startPct)
 
 	return (
 		<Sublane
