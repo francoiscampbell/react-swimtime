@@ -1,0 +1,25 @@
+{
+  "name": "react-swimtime",
+  "version": "0.0.1",
+  "description": "Timeline / Swimlane library for React",
+  "main": "index.tsx",
+  "repository": "git@github.com:francoiscampbell/react-swimtime.git",
+  "author": "Francois Campbell <campbell.francois@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "peerDependencies": {
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "styled-components": "^3.1.6"
+  },
+  "devDependencies": {
+    "@types/react": "^16.0.40",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "styled-components": "^3.1.6",
+    "ts-loader": "^4.0.1",
+    "typescript": "^2.7.2",
+    "webpack": "^4.0.1",
+    "webpack-cli": "^2.0.10"
+  }
+}
