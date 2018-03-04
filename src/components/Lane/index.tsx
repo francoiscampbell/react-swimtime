@@ -24,19 +24,13 @@ function getSublane(laneProps: LaneProps, sublaneData: SublaneData, key?: number
 	const startPct = (start.getTime() - laneProps.startTime) / laneProps.timeInterval * 100
 	const widthPct = (end.getTime() - laneProps.startTime) / laneProps.timeInterval * 100 - startPct
 
-	const sublaneProps = {
-		data: rest,
-		key,
-		renderBar: laneProps.renderBar,
-		startPct,
-		widthPct,
-	}
-	if (key === undefined) {
-		delete sublaneProps.key
-	}
 	return (
 		<Sublane
-			{...sublaneProps}
+			data={rest}
+			key={key}
+			renderBar={laneProps.renderBar}
+			startPct={startPct}
+			widthPct={widthPct}
 		/>
 	)
 }

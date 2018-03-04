@@ -14,13 +14,8 @@ interface BarProps {
 	widthPct: number
 }
 
-const Filler = styled.div`
-	flex: 0 0 auto;
-	width: ${(props: BarProps) => props.widthPct}%;
-`
-
-const BarContainer = styled.div`
-	width: ${(props: BarProps) => props.widthPct}%;
+const FlexBar = styled.div`
+	flex: 0 0 ${(props: BarProps) => props.widthPct}%;
 `
 
 export interface SublaneProps {
@@ -35,12 +30,12 @@ const Sublane: React.SFC<SublaneProps> = props => {
 
 	return (
 		<SublaneContainer>
-			<Filler widthPct={props.startPct}/>
-			<BarContainer
+			<FlexBar widthPct={props.startPct}/>
+			<FlexBar
 				widthPct={props.widthPct}
 			>
 				{props.renderBar(data)}
-			</BarContainer>
+			</FlexBar>
 		</SublaneContainer>
 	)
 }
