@@ -24,8 +24,11 @@ export default class WithZoom extends React.PureComponent<WithZoomProps, WithZoo
 
 	onMouseWheel = e => {
 		const scaleIncrement = e.deltaY / 300
-		this.setState({
-			scaleFactor: this.state.scaleFactor * (1 + scaleIncrement)
-		})
+		if (scaleIncrement < 1 && scaleIncrement > -1) {
+			this.setState({
+				scaleFactor: this.state.scaleFactor * (1 + scaleIncrement)
+			})
+		}
+		e.stopPropagation()
 	}
 }
