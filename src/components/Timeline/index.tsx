@@ -6,6 +6,7 @@ import {
 	LaneData, 
 	SublaneData
 } from '../../types/LaneData'
+import WithZoom from '../WithZoom'
 
 
 interface AppContainerProps {
@@ -38,6 +39,7 @@ const Timeline: React.SFC<TimelineProps> = props => {
 			{scaleFactor => {
 				const halfInterval = timeInterval / 2
 				const scaledStartTime = startTime + halfInterval * (1 - scaleFactor)
+				const scaledTimeInterval = timeInterval * scaleFactor
 				return (
 					<React.Fragment>
 						<TimelineContainer>
@@ -47,13 +49,13 @@ const Timeline: React.SFC<TimelineProps> = props => {
 									laneData={laneData}
 									renderBar={props.renderBar}
 									startTime={scaledStartTime}
-									timeInterval={timeInterval * scaleFactor}
+									timeInterval={scaledTimeInterval}
 								/>
 							))}
 						</TimelineContainer>
 						<DateContainer>
-							<span>{props.startDate.toLocaleString()}</span>
-							<span>{props.endDate.toLocaleString()}</span>
+							<span>{new Date(scaledStartTime).toLocaleString()}</span>
+							<span>{new Date(scaledStartTime + scaledTimeInterval).toLocaleString()}</span>
 						</DateContainer>
 					</React.Fragment>
 				)
@@ -63,35 +65,3 @@ const Timeline: React.SFC<TimelineProps> = props => {
 }
 
 export default Timeline
-
-
-interface WithZoomProps {
-	children: (number) => new() => React.Component
-}
-
-interface WithZoomState {
-	scaleFactor: number
-}
-
-class WithZoom extends React.PureComponent<WithZoomProps> {
-	state = {
-		scaleFactor: 1
-	}
-
-	render() {
-		return (
-			<div onWheel={this.onMouseWheel}>
-				{this.props.children(this.state.scaleFactor)}
-			</div>
-		)
-	}
-
-	onMouseWheel = e => {
-		const scaleIncrement = e.deltaY / 300
-		this.setState({
-			scaleFactor: this.state.scaleFactor * (1 + scaleIncrement)
-		})
-	}
-
-
-}
