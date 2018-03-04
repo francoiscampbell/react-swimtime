@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { SublaneData } from '../../types/LaneData'
+import { SublaneExtraData } from '../../types/LaneData'
 
 
 const SublaneContainer = styled.div`
@@ -11,44 +11,33 @@ const SublaneContainer = styled.div`
 `
 
 interface BarProps {
-	width: number
+	widthPct: number
 }
 
 const Filler = styled.div`
 	flex: 0 0 auto;
-	width: ${(props: BarProps) => props.width}px;
+	width: ${(props: BarProps) => props.widthPct}%;
 `
 
 const BarContainer = styled.div`
-	width: ${(props: BarProps) => props.width}px;
+	width: ${(props: BarProps) => props.widthPct}%;
 `
 
-function map(
-	number: number,
-	fromMin: number, 
-	fromMax: number, 
-	toMin: number, 
-	toMax: number
-) {
-	return (toMax - toMin) * ((number - fromMin) / (fromMax - fromMin)) + toMin
-}
-
 export interface SublaneProps {
-	data: SublaneData,
+	data: SublaneExtraData,
 	renderBar: (SublaneData) => new() => React.Component
-	startTime: number
+	startPct: number,
+	widthPct: number
 }
 
 const Sublane: React.SFC<SublaneProps> = props => {
 	const data = props.data
 
-	const startPx = map(data.start.getTime(), props.startTime, props.startTime + 5000000, 0, 1000)
-	const endPx = map(data.end.getTime(), props.startTime, props.startTime + 5000000, 0, 1000)
 	return (
 		<SublaneContainer>
-			<Filler width={startPx}/>
+			<Filler widthPct={props.startPct}/>
 			<BarContainer
-				width={endPx - startPx}
+				widthPct={props.widthPct}
 			>
 				{props.renderBar(data)}
 			</BarContainer>

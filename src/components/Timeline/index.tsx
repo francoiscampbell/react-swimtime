@@ -18,12 +18,14 @@ const DateContainer = styled.div`
 
 export interface TimelineProps {
 	data: LaneData[],
+	endDate: Date,
 	renderBar: (SublaneData) => new() => React.Component
+	startDate: Date
 }
 
 const Timeline: React.SFC<TimelineProps> = props => {
-	const currentDate = new Date()
-	const currentTime = currentDate.getTime()
+	const startTime = props.startDate.getTime()
+	const timeInterval = props.endDate.getTime() - startTime
 	return (
 		<React.Fragment>
 			<TimelineContainer>
@@ -32,13 +34,14 @@ const Timeline: React.SFC<TimelineProps> = props => {
 						key={i}
 						laneData={laneData}
 						renderBar={props.renderBar}
-						startTime={currentTime}
+						startTime={startTime}
+						timeInterval={timeInterval}
 					/>
 				))}
 			</TimelineContainer>
 			<DateContainer>
-				<span>{currentDate.toLocaleString()}</span>
-				<span>{new Date(currentTime + 5000000).toLocaleString()}</span>
+				<span>{props.startDate.toLocaleString()}</span>
+				<span>{props.endDate.toLocaleString()}</span>
 			</DateContainer>
 		</React.Fragment>
 	)

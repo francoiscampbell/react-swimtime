@@ -15,31 +15,44 @@ const LaneContainer = styled.div`
 	}    
 `
 
+function getSublane(laneProps: LaneProps, sublaneData: SublaneData, key?: number) {
+	const {
+		start,
+		end,
+		...rest
+	} = sublaneData
+	const startPct = (start.getTime() - laneProps.startTime) / laneProps.timeInterval * 100
+	const widthPct = (end.getTime() - laneProps.startTime) / laneProps.timeInterval * 100 - startPct
+
+	const sublaneProps = {
+		data: rest,
+		key,
+		renderBar: laneProps.renderBar,
+		startPct,
+		widthPct,
+	}
+	if (key === undefined) {
+		delete sublaneProps.key
+	}
+	return (
+		<Sublane
+			{...sublaneProps}
+		/>
+	)
+}
+
 export interface LaneProps {
 	laneData: LaneData,
 	renderBar: (SublaneData) => new() => React.Component,
-	startTime: number
+	startTime: number,
+	timeInterval: number,
 }
 
 const Lane: React.SFC<LaneProps> = props => {
 	const laneData = props.laneData
 	const sublanes = Array.isArray(laneData) ?
-		laneData.map((sublaneData, i) => {
-			return (
-				<Sublane
-					data={sublaneData}
-					key={i}
-					renderBar={props.renderBar}
-					startTime={props.startTime}
-				/>
-			)	
-		}) : (
-			<Sublane
-				data={laneData}
-				renderBar={props.renderBar}
-				startTime={props.startTime}
-			/>
-		)	
+		laneData.map((sublaneData, i) => getSublane(props, sublaneData, i)) : 
+		getSublane(props, laneData)	
 	return (
 		<LaneContainer>
 			{sublanes}
