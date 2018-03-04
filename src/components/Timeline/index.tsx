@@ -7,6 +7,11 @@ import {
 	SublaneData
 } from '../../types/LaneData'
 
+
+interface AppContainerProps {
+	widthPx: number
+}
+
 const TimelineContainer = styled.div`
 	overflow: auto;
 	border: 1px solid;
@@ -29,7 +34,7 @@ const Timeline: React.SFC<TimelineProps> = props => {
 	const startTime = props.startDate.getTime()
 	const timeInterval = props.endDate.getTime() - startTime
 	return (
-		<React.Fragment>
+		<ZoomDiv>
 			<TimelineContainer>
 				{props.data.map((laneData, i) => (
 					<Lane
@@ -45,8 +50,45 @@ const Timeline: React.SFC<TimelineProps> = props => {
 				<span>{props.startDate.toLocaleString()}</span>
 				<span>{props.endDate.toLocaleString()}</span>
 			</DateContainer>
-		</React.Fragment>
+		</ZoomDiv>
 	)
 }
 
 export default Timeline
+
+
+const AppContainer = styled.div`
+	width: ${(props: AppContainerProps) => props.widthPx}px;
+`
+
+interface ZoomDivState {
+	widthPx: number
+}
+
+class ZoomDiv extends React.PureComponent<{}, ZoomDivState> {
+	state = {
+		widthPx: 1000
+	}
+
+	render() {
+		return (
+			<AppContainer 
+				onWheel={this.onMouseWheel}
+				widthPx={this.state.widthPx}
+			>
+				{this.props.children}
+			</AppContainer>
+		)
+	}
+
+	onMouseWheel = e => {
+		const scaleIncrement = -e.deltaY
+		console.log(e.deltaY)
+		console.log(scaleIncrement)
+		this.setState({
+			widthPx: this.state.widthPx + scaleIncrement
+		})
+	}
+
+
+}
