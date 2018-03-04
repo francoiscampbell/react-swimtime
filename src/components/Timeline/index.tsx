@@ -9,11 +9,13 @@ import {
 
 const TimelineContainer = styled.div`
 	overflow: auto;
+	border: 1px solid;
 `
 
 const DateContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
+	padding: 8px 0;
 `
 
 export interface TimelineProps {
