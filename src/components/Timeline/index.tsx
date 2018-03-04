@@ -57,6 +57,10 @@ const Timeline: React.SFC<TimelineProps> = props => {
 							<span>{new Date(scaledStartTime).toLocaleString()}</span>
 							<span>{new Date(scaledStartTime + scaledTimeInterval).toLocaleString()}</span>
 						</DateContainer>
+						<DateContainer>
+							<span>{scaledStartTime}</span>
+							<span>{scaledStartTime + scaledTimeInterval}</span>
+						</DateContainer>
 					</React.Fragment>
 				)
 			}}
