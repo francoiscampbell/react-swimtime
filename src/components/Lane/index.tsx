@@ -1,11 +1,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import Sublane from 'components/Sublane'
+import Sublane from '../Sublane'
 import { 
 	LaneData,
 	SublaneData
-} from 'types/LaneData'
+} from '../../types/LaneData'
 
 const LaneContainer = styled.div`
 	border-bottom: 1px solid;
@@ -15,7 +15,7 @@ const LaneContainer = styled.div`
 	}    
 `
 
-interface LaneProps {
+export interface LaneProps {
 	laneData: LaneData,
 	renderBar: (SublaneData) => new() => React.Component,
 	startTime: number

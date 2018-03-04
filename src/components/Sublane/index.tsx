@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { SublaneData } from 'types/LaneData'
+import { SublaneData } from '../../types/LaneData'
 
 
 const SublaneContainer = styled.div`
@@ -33,7 +33,7 @@ function map(
 	return (toMax - toMin) * ((number - fromMin) / (fromMax - fromMin)) + toMin
 }
 
-interface SublaneProps {
+export interface SublaneProps {
 	data: SublaneData,
 	renderBar: (SublaneData) => new() => React.Component
 	startTime: number

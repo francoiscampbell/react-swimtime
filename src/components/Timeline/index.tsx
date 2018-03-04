@@ -1,11 +1,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import Lane from 'components/Lane'
+import Lane from '../Lane'
 import { 
 	LaneData, 
 	SublaneData
-} from 'types/LaneData'
+} from '../../types/LaneData'
 
 const TimelineContainer = styled.div`
 	overflow: auto;
@@ -16,8 +16,8 @@ const DateContainer = styled.div`
 	justify-content: space-between;
 `
 
-interface TimelineProps {
-	data: Array<LaneData>,
+export interface TimelineProps {
+	data: LaneData[],
 	renderBar: (SublaneData) => new() => React.Component
 }
 
