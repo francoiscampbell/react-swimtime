@@ -29,6 +29,6 @@ export default class WithZoom extends React.PureComponent<WithZoomProps, WithZoo
 				scaleFactor: this.state.scaleFactor * (1 + scaleIncrement)
 			})
 		}
-		e.stopPropagation()
+		e.preventDefault()
 	}
 }
