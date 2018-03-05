@@ -16,6 +16,7 @@ interface AppContainerProps {
 const TimelineContainer = styled.div`
 	overflow: auto;
 	border: 1px solid;
+	position: relative;
 `
 
 const DateContainer = styled.div`
@@ -42,17 +43,12 @@ const Timeline: React.SFC<TimelineProps> = props => {
 				const scaledTimeInterval = timeInterval * scaleFactor
 				return (
 					<React.Fragment>
-						<TimelineContainer>
-							{props.data.map((laneData, i) => (
-								<Lane
-									key={i}
-									laneData={laneData}
-									renderBar={props.renderBar}
-									startTime={scaledStartTime}
-									timeInterval={scaledTimeInterval}
-								/>
-							))}
-						</TimelineContainer>
+						<TimelineInternal
+                            data={props.data}
+                            renderBar={props.renderBar}
+                            startTime={scaledStartTime}
+                            timeInterval={scaledTimeInterval}
+                        />
 						<DateContainer>
 							<span>{new Date(scaledStartTime).toLocaleString()}</span>
 							<span>{new Date(scaledStartTime + scaledTimeInterval).toLocaleString()}</span>
@@ -69,3 +65,89 @@ const Timeline: React.SFC<TimelineProps> = props => {
 }
 
 export default Timeline
+
+
+const ZoomArea = styled.div`
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background-color: #cccccc60;
+	border-left: 1px solid red;
+	border-right: 1px solid red;
+`
+
+const TimelineInternalContainer = styled.div`
+    position: relative;
+`
+
+class TimelineInternal extends React.PureComponent {
+    state = {
+        mouseDownX: null,
+        mouseMoveX: null
+    }
+
+    ref = null
+
+    render() {
+        return (
+            <TimelineInternalContainer
+                onMouseDown={this.onMouseDown}
+                onMouseMove={this.onMouseMove}
+                onMouseUp={this.onMouseUp}
+            >
+                <TimelineContainer>
+                    {this.props.data.map((laneData, i) => (
+                        <Lane
+                            key={i}
+                            laneData={laneData}
+                            renderBar={this.props.renderBar}
+                            startTime={this.props.startTime}
+                            timeInterval={this.props.timeInterval}
+                        />
+                    ))}
+                </TimelineContainer>
+                {this.zoomArea}
+            </TimelineInternalContainer>
+
+        )
+    }
+
+    get zoomArea() {
+        if (
+            this.state.mouseDownX &&
+            this.state.mouseMoveX
+        ) {
+            const left = this.state.mouseDownX
+            const width = this.state.mouseMoveX - this.state.mouseDownX
+            return (
+                <ZoomArea
+                    style={{
+                        left: `${left + Math.min(width, 0)}px`,
+                        width: `${Math.abs(width)}px`,
+                    }}
+                />
+            )
+        }
+    }
+
+    onMouseDown = e => {
+        this.setState({
+            mouseDownX: e.clientX - e.currentTarget.getBoundingClientRect().x
+        })
+    }
+
+    onMouseMove = e => {
+        if (this.state.mouseDownX) {
+            this.setState({
+                mouseMoveX: e.clientX - e.currentTarget.getBoundingClientRect().x
+            })
+        }
+    }
+
+    onMouseUp = () => {
+        this.setState({
+            mouseDownX: null,
+            mouseMoveX: null
+        })
+    }
+}
