@@ -82,6 +82,7 @@ const TimelineInternalContainer = styled.div`
 
 class TimelineInternal extends React.PureComponent {
     state = {
+        mouseDownRect: null,
         mouseDownX: null,
         mouseMoveX: null
     }
@@ -131,21 +132,24 @@ class TimelineInternal extends React.PureComponent {
     }
 
     onMouseDown = e => {
+        const mouseDownRect = e.currentTarget.getBoundingClientRect()
         this.setState({
-            mouseDownX: e.clientX - e.currentTarget.getBoundingClientRect().x
+            mouseDownRect,
+            mouseDownX: e.clientX - mouseDownRect.x
         })
     }
 
     onMouseMove = e => {
         if (this.state.mouseDownX) {
             this.setState({
-                mouseMoveX: e.clientX - e.currentTarget.getBoundingClientRect().x
+                mouseMoveX: e.clientX - this.state.mouseDownRect.x
             })
         }
     }
 
     onMouseUp = () => {
         this.setState({
+            mouseDownRect: null,
             mouseDownX: null,
             mouseMoveX: null
         })
