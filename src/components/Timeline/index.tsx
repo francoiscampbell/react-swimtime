@@ -2,15 +2,15 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import Lane from '../Lane'
-import { 
-	LaneData, 
-	SublaneData
+import {
+    LaneData,
+    SublaneData,
 } from '../../types/LaneData'
 import WithZoom from '../WithZoom'
 
 
 interface AppContainerProps {
-	widthPx: number
+    widthPx: number
 }
 
 const TimelineContainer = styled.div`
@@ -26,132 +26,67 @@ const DateContainer = styled.div`
 `
 
 export interface TimelineProps {
-	data: LaneData[],
-	endDate: Date,
-	renderBar: (SublaneData) => new() => React.Component
-	startDate: Date
+    data: LaneData[],
+    endDate: Date,
+    renderBar: (SublaneData) => new() => React.Component
+    startDate: Date
 }
 
-const Timeline: React.SFC<TimelineProps> = props => {
-	const startTime = props.startDate.getTime()
-	const timeInterval = props.endDate.getTime() - startTime
-	return (
-		<WithZoom>
-			{scaleFactor => {
-				const halfInterval = timeInterval / 2
-				const scaledStartTime = startTime + halfInterval * (1 - scaleFactor)
-				const scaledTimeInterval = timeInterval * scaleFactor
-				return (
-					<React.Fragment>
-						<TimelineInternal
-                            data={props.data}
-                            renderBar={props.renderBar}
-                            startTime={scaledStartTime}
-                            timeInterval={scaledTimeInterval}
-                        />
-						<DateContainer>
-							<span>{new Date(scaledStartTime).toLocaleString()}</span>
-							<span>{new Date(scaledStartTime + scaledTimeInterval).toLocaleString()}</span>
-						</DateContainer>
-						<DateContainer>
-							<span>{scaledStartTime}</span>
-							<span>{scaledStartTime + scaledTimeInterval}</span>
-						</DateContainer>
-					</React.Fragment>
-				)
-			}}
-		</WithZoom>
-	)
+export interface TimelineState {
+    scaledStartTime: number,
+    scaledTimeInterval: number,
 }
 
-export default Timeline
+export default class Timeline extends React.PureComponent<TimelineProps, TimelineState> {
 
-
-const ZoomArea = styled.div`
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	background-color: #cccccc60;
-	border-left: 1px solid red;
-	border-right: 1px solid red;
-`
-
-const TimelineInternalContainer = styled.div`
-    position: relative;
-`
-
-class TimelineInternal extends React.PureComponent {
-    state = {
-        mouseDownRect: null,
-        mouseDownX: null,
-        mouseMoveX: null
+    constructor(props) {
+        super(props)
+        const scaledStartTime = props.startDate.getTime()
+        const scaledTimeInterval = props.endDate.getTime() - scaledStartTime
+        this.state = {
+            scaledStartTime,
+            scaledTimeInterval,
+        }
     }
 
-    ref = null
-
     render() {
+        const scaledStartTime = this.state.scaledStartTime
+        const scaledTimeInterval = this.state.scaledTimeInterval
         return (
-            <TimelineInternalContainer
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}
-            >
-                <TimelineContainer>
-                    {this.props.data.map((laneData, i) => (
-                        <Lane
-                            key={i}
-                            laneData={laneData}
-                            renderBar={this.props.renderBar}
-                            startTime={this.props.startTime}
-                            timeInterval={this.props.timeInterval}
-                        />
-                    ))}
-                </TimelineContainer>
-                {this.zoomArea}
-            </TimelineInternalContainer>
-
+            <React.Fragment>
+                <WithZoom onZoomChange={this.onZoomChange}>
+                    <TimelineContainer>
+                        {this.props.data.map((laneData, i) => (
+                            <Lane
+                                key={i}
+                                laneData={laneData}
+                                renderBar={this.props.renderBar}
+                                startTime={scaledStartTime}
+                                timeInterval={scaledTimeInterval}
+                            />
+                        ))}
+                    </TimelineContainer>
+                </WithZoom>
+                <DateContainer>
+                    <span>{new Date(scaledStartTime).toLocaleString()}</span>
+                    <span>{new Date(scaledStartTime + scaledTimeInterval).toLocaleString()}</span>
+                </DateContainer>
+                <DateContainer>
+                    <span>{scaledStartTime}</span>
+                    <span>{scaledStartTime + scaledTimeInterval}</span>
+                </DateContainer>
+            </React.Fragment>
         )
     }
 
-    get zoomArea() {
-        if (
-            this.state.mouseDownX &&
-            this.state.mouseMoveX
-        ) {
-            const left = this.state.mouseDownX
-            const width = this.state.mouseMoveX - this.state.mouseDownX
-            return (
-                <ZoomArea
-                    style={{
-                        left: `${left + Math.min(width, 0)}px`,
-                        width: `${Math.abs(width)}px`,
-                    }}
-                />
-            )
-        }
-    }
+    onZoomChange = (leftRatio, rightRatio) => {
+        const scaledStartTime = this.state.scaledStartTime + this.state.scaledTimeInterval * leftRatio
+        const scaledEndTime = this.state.scaledStartTime + this.state.scaledTimeInterval * rightRatio
+        const scaledTimeInterval = scaledEndTime - scaledStartTime
 
-    onMouseDown = e => {
-        const mouseDownRect = e.currentTarget.getBoundingClientRect()
         this.setState({
-            mouseDownRect,
-            mouseDownX: e.clientX - mouseDownRect.x
-        })
-    }
-
-    onMouseMove = e => {
-        if (this.state.mouseDownX) {
-            this.setState({
-                mouseMoveX: e.clientX - this.state.mouseDownRect.x
-            })
-        }
-    }
-
-    onMouseUp = () => {
-        this.setState({
-            mouseDownRect: null,
-            mouseDownX: null,
-            mouseMoveX: null
+            scaledStartTime,
+            scaledTimeInterval,
         })
     }
 }
