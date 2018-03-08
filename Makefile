@@ -15,7 +15,7 @@ watch:
 	$(TSC) -w
 
 .PHONY: publish
-publish:
+publish: build
 	yarn publish
 
 node_modules:
