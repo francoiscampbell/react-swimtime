@@ -16,7 +16,7 @@ const ZoomAreaInner = styled.div`
 `
 
 export interface WithZoomProps {
-	onZoomChange: (number, number) => void
+	onZoomChange: (leftRatio: number, rightRatio: number) => void
 }
 
 export interface WithZoomState {
