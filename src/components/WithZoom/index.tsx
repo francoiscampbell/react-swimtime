@@ -87,17 +87,35 @@ export default class WithZoom extends React.PureComponent<WithZoomProps, WithZoo
     }
 
     onMouseUp = e => {
-	    const rectWidth = this.state.mouseDownRect.right - this.state.mouseDownRect.left
-        const localX = e.clientX - this.state.mouseDownRect.x
+        const mouseDownRect = this.state.mouseDownRect
+        if (!mouseDownRect) {
+            return
+        }
+
+	    const elementWidth = mouseDownRect.right - mouseDownRect.left
+        const localX = e.clientX - mouseDownRect.x
 
         const leftPos = Math.min(this.state.mouseDownX, localX)
         const rightPos = Math.max(this.state.mouseDownX, localX)
-        const leftRatio = leftPos / rectWidth
-        const rightRatio = rightPos / rectWidth
+
+        const leftRatio = leftPos / elementWidth
+        const rightRatio = rightPos / elementWidth
 
         if (e.shiftKey) {
-            this.props.onZoomChange(1 / (1 + leftRatio) - 1, 1 / (1 + rightRatio) * 2)
+            const selectionWidth = rightPos - leftPos
+            if (selectionWidth === 0) {
+                return
+            }
+            const whitespaceScaleRatio = elementWidth / selectionWidth
+            const leftWhitespaceRatio = leftRatio
+            const rightWhitespaceRatio = 1 - rightRatio
+
+            const leftRatioZoomOut = 0 - leftWhitespaceRatio * whitespaceScaleRatio
+            const rightRatioZoomOut = 1 + rightWhitespaceRatio * whitespaceScaleRatio
+
+            this.props.onZoomChange(leftRatioZoomOut, rightRatioZoomOut)
         } else {
+
             this.props.onZoomChange(leftRatio, rightRatio)
         }
 
